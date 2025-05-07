@@ -1,0 +1,11 @@
+services:
+  frontend:
+    image: topavasquez/frontend:latest
+    ports:
+      - "3000:3000"
+
+  usuario-servicio:
+    image: topavasquez/usuario-servicio:latest
+    ports:
+      - "8081:8080"
+
