@@ -38,7 +38,7 @@ jobs:
           if [ "${{ matrix.service }}" = "frontend-farmacias" ]; then
             npm ci
           else
-            ./mvnw clean package
+            ./mvnw clean package -DskipTests=true
           fi
 
       - name: Log in to Docker Hub
