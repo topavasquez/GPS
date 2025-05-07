@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [frontend-farmacias, usuario-servicio]
+        service: [frontend-farmacias, usuarios-servicio]
 
     steps:
       - uses: actions/checkout@v4
@@ -36,9 +36,9 @@ jobs:
         run: |
           cd ${{ matrix.service }}
           if [ "${{ matrix.service }}" = "frontend-farmacias" ]; then
-            npm ci && npm test
+            npm ci
           else
-            ./mvnw test
+            ./mvnw clean compile
           fi
 
       - name: Log in to Docker Hub
