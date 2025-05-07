@@ -14,19 +14,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [frontend, usuario-servicio]
+        service: [frontend-farmacias, usuario-servicio]
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Java
-        if: matrix.service != 'frontend'
+        if: matrix.service != 'frontend-farmacias'
         uses: actions/setup-java@v4
         with:
           java-version: 17
+          distribution: 'temurin'
 
       - name: Set up Node.js
-        if: matrix.service == 'frontend'
+        if: matrix.service == 'frontend-farmacias'
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -34,7 +35,7 @@ jobs:
       - name: Install dependencies & test
         run: |
           cd ${{ matrix.service }}
-          if [ "${{ matrix.service }}" = "frontend" ]; then
+          if [ "${{ matrix.service }}" = "frontend-farmacias" ]; then
             npm ci && npm test
           else
             ./mvnw test
