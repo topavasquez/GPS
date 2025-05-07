@@ -36,9 +36,9 @@ jobs:
         run: |
           cd ${{ matrix.service }}
           if [ "${{ matrix.service }}" = "frontend-farmacias" ]; then
-            npm ci
+            npm ci && npm run test
           else
-            ./mvnw clean package -DskipTests
+            ./mvnw test
           fi
 
       - name: Log in to Docker Hub
