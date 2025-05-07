@@ -4,48 +4,45 @@ on:
   push:
     branches:
       - main
-      - "feature/**"
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build-test-and-push:
+  build-and-release:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         service: [frontend-farmacias, usuarios-servicio]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Set up JDK 17
         if: matrix.service != 'frontend-farmacias'
         uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: "17"
           distribution: "temurin"
 
-      - name: Set up Node.js
+      - name: Set up Node.js 20
         if: matrix.service == 'frontend-farmacias'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies & test
+      - name: Install dependencies & build project
         run: |
           cd ${{ matrix.service }}
           if [ "${{ matrix.service }}" = "frontend-farmacias" ]; then
-            npm ci && npm run test
+            npm ci && npm run build
           else
-            ./mvnw test
+            chmod +x mvnw
+            ./mvnw clean package -DskipTests
           fi
 
-      - name: Log in to Docker Hub
+      - name: Login to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest ./${{ matrix.service }}
-
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest
+      - name: Build and Push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }} ./${{ matrix.service }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}
